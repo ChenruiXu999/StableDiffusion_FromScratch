@@ -231,3 +231,41 @@ class UNET(nn.Module):
             x = torch.cat((x, skip_connections.pop()), dim=1) 
             x = layers(x, context, time) 
         return x
+    
+class UNET_OutputLayer(nn.Module):
+    def __init__(self, in_channels, out_channels):
+        super().__init__()
+        self.groupnorm = nn.GroupNorm(32, in_channels)
+        self.conv = nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1)
+    
+    def forward(self, x):
+        # x: (Batch_Size, 320, Height / 8, Width / 8)
+        # (Batch_Size, 320, Height / 8, Width / 8) -> (Batch_Size, 320, Height / 8, Width / 8)
+        x = self.groupnorm(x)
+        # (Batch_Size, 320, Height / 8, Width / 8) -> (Batch_Size, 320, Height / 8, Width / 8)
+        x = F.silu(x)
+        # (Batch_Size, 320, Height / 8, Width / 8) -> (Batch_Size, 4, Height / 8, Width / 8)
+        x = self.conv(x)
+        # (Batch_Size, 4, Height / 8, Width / 8) 
+        return x
+    
+
+class Diffusion(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.time_embedding = TimeEmbedding(320)
+        self.unet = UNET()
+        self.final = UNET_OutputLayer(320, 4)
+    
+    def forward(self, latent, context, time):
+        # latent: (Batch_Size, 4, Height / 8, Width / 8)
+        # context: (Batch_Size, Seq_Len, Dim)
+        # time: (1, 320)
+        # (1, 320) -> (1, 1280)
+        time = self.time_embedding(time)
+        # (Batch, 4, Height / 8, Width / 8) -> (Batch, 320, Height / 8, Width / 8)
+        output = self.unet(latent, context, time)
+        # (Batch, 320, Height / 8, Width / 8) -> (Batch, 4, Height / 8, Width / 8)
+        output = self.final(output)
+        # (Batch, 4, Height / 8, Width / 8)
+        return output
