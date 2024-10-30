@@ -249,7 +249,6 @@ class UNET_OutputLayer(nn.Module):
         # (Batch_Size, 4, Height / 8, Width / 8) 
         return x
     
-
 class Diffusion(nn.Module):
     def __init__(self):
         super().__init__()

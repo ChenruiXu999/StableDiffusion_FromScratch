@@ -18,7 +18,7 @@ class SelfAttention(nn.Module):
         # (Batch_Size, Seq_Len, H, Dim / H)
         interim_shape = (batch_size, sequence_length, self.n_heads, self.d_head) 
         # (Batch_Size, Seq_Len, Dim) -> (Batch_Size, Seq_Len, Dim * 3) -> 3 tensor of shape (Batch_Size, Seq_Len, Dim)
-        q, k, v = self.in_proj(x).chunk(3, dim=-1)
+        q, k, v = self.in_proj(x).chunk(3, dim=-1)#chunk用来切分矩阵
         # (Batch_Size, Seq_Len, Dim) -> (Batch_Size, Seq_Len, H, Dim / H) -> (Batch_Size, H, Seq_Len, Dim / H)
         q = q.view(interim_shape).transpose(1, 2)
         k = k.view(interim_shape).transpose(1, 2)
@@ -28,7 +28,7 @@ class SelfAttention(nn.Module):
         
         if causal_mask:
             # Mask where the upper triangle (above the principal diagonal) is 1
-            mask = torch.ones_like(weight, dtype=torch.bool).triu(1) 
+            mask = torch.ones_like(weight, dtype=torch.bool).triu(1) #ones_like 返回一个和输入tensor大小相同的全1的tensor
             # Fill the upper triangle with -inf
             weight.masked_fill_(mask, -torch.inf) 
         

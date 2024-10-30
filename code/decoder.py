@@ -8,7 +8,8 @@ class VAE_AttentionBlock(nn.Module):
         super().__init__()
         self.groupnorm = nn.GroupNorm(32,channels)
         self.attention = SelfAttention(1,channels)
-
+        
+    #下面features就是channels
     def forward(self,x):
         # x: (Batch_Size, Features, Height, Width)
         residue = x 
