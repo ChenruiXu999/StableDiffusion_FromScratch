@@ -61,7 +61,7 @@ class VAE_Encoder(nn.Sequential):
                 x = F.pad(x, (0, 1, 0, 1))
             x = module(x)
         # (Batch_Size, 8, Height / 8, Width / 8) -> two tensors of shape (Batch_Size, 4, Height / 8, Width / 8)
-        mean, log_variance = torch.chunk(x, 2, dim=1)
+        mean, log_variance = torch.chunk(x, 2, dim=1)#encoder共输出8个channel，4个张量是mean，4个张量是variance
         # Clamp the log variance between -30 and 20, so that the variance is between (circa) 1e-14 and 1e8. 
         # (Batch_Size, 4, Height / 8, Width / 8) -> (Batch_Size, 4, Height / 8, Width / 8)
         log_variance = torch.clamp(log_variance, -30, 20)

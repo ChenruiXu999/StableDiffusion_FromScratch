@@ -3,11 +3,12 @@ from torch import nn
 from torch.nn import functional as F
 from attention import SelfAttention
 
+#clip这里输入的应该是text
 class ClipEmbedding(nn.Module):
     def __init__(self,n_vocab,n_embed,n_token):
         super.__init__()
         self.token_embed = nn.Embedding(n_vocab,n_embed)
-        self.position_embedding = nn.Parameter(torch.zeros((n_token,n_embed)))
+        self.position_embedding = nn.Parameter(torch.zeros((n_token,n_embed)))#可训练位置编码
 
     def forward(self,tokens):
         # (Batch_Size, Seq_Len) -> (Batch_Size, Seq_Len, Dim) 
@@ -15,7 +16,8 @@ class ClipEmbedding(nn.Module):
         # (Batch_Size, Seq_Len) -> (Batch_Size, Seq_Len, Dim)
         x += self.position_embedding
         return x
-    
+
+#norm+attention+mlp模块   
 class ClipLayer(nn.Module):
     def __init__(self,n_embd,n_head):
         super.__init__()
