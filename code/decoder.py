@@ -114,11 +114,13 @@ class VAE_Decoder(nn.Module):
         )
     def foward(self,x):
         # x: (Batch_Size, 4, Height / 8, Width / 8)
+        # ？输入的x是否是encoder部分的mean和variance
         # Remove the scaling added by the Encoder.
         x /= 0.18215
         for module in self:
             x = module(x)
         # (Batch_Size, 3, Height, Width)
-        return x
+        return x #这里返回了一张图，3个channel
+    
 
 

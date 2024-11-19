@@ -138,6 +138,8 @@ class Upsample(nn.Module):
         x = F.interpolate(x, scale_factor=2, mode='nearest') 
         return self.conv(x)
 
+#如果是attention的block，处理图片和文字
+#如果是resblock，处理图片和时间
 class SwitchSequential(nn.Sequential):
     def forward(self, x, context, time):
         for layer in self:
@@ -146,7 +148,7 @@ class SwitchSequential(nn.Sequential):
             elif isinstance(layer, UNET_ResidualBlock):
                 x = layer(x, time)
             else:
-                x = layer(x)
+                x = layer(x)#这里指的是nn.Conv的情况
         return x
     
 class UNET(nn.Module):
